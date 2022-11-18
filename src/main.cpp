@@ -1,5 +1,4 @@
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_opengl.h>
 #include <SDL2/SDL_image.h>
 #include <stdio.h>
 
@@ -14,6 +13,10 @@ static int resizeCallback(void *data, SDL_Event *event) {
 	return 0;
 }
 
+/*
+Load a surface from a file
+Return NULL if we can't load the surface
+*/
 SDL_Surface* loadSurface(SDL_Window *window, char *fname) {
     SDL_Surface *temp = NULL;
     SDL_Surface *opt = NULL;
@@ -65,23 +68,38 @@ int main(int argc, char *argv[]) {
 		return -1;
 	}
 
+	// triggers the program that controls
+    // your graphics hardware and sets flags
+    Uint32 render_flags = SDL_RENDERER_ACCELERATED;
+ 
+    // creates a renderer to render our images
+    SDL_Renderer* rend = SDL_CreateRenderer(sdl_window, -1, render_flags);
+
     // load assets
     SDL_Surface *reaper = loadSurface(sdl_window, "../assets/reaper.png");
     if (reaper == NULL) {
         printf("Could not initialize asset");
         return -1;
     }
+
+	// loads image to our graphics hardware memory.
+    SDL_Texture* tex = SDL_CreateTextureFromSurface(rend, reaper);
+
     // free memory when we are done with it
     SDL_FreeSurface(reaper);
 
+	// let us control our image position
+    // so that we can move it with our keyboard.
+    SDL_Rect dest;
+ 
+    // connects our texture with dest to control position
+    SDL_QueryTexture(tex, NULL, NULL, &dest.w, &dest.h);
+	// sets initial x-position of object
+    dest.x = 20;
+    // sets initial y-position of object
+    dest.y = 20;
+
 	SDL_AddEventWatch(resizeCallback, sdl_window);
-
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 1);
-	SDL_GLContext Context = SDL_GL_CreateContext(sdl_window);
-
-	glClearColor(1.f, 0.f, 1.f, 0.f); //pink background
-	glViewport(0, 0, win_width, win_height);
 
 	bool isRunning = true;
 	SDL_Event sdl_event;
@@ -106,25 +124,28 @@ int main(int argc, char *argv[]) {
 						SDL_SetWindowFullscreen(sdl_window, window_flags);
 					}
 					SDL_GetWindowSize(sdl_window, &win_width, &win_height);
-					glViewport(0, 0, win_width, win_height);
 					break;
 				}
 			}
-
-			// 2. update screen
-
-			// clear screen
-			glClear(GL_COLOR_BUFFER_BIT);
-
-			// add new updates
-			// your updated stuff to render here (future todo)
-
-			// swap to new updated screen to render
-			SDL_GL_SwapWindow(sdl_window);
 		}
+
+		// 2. update screen
+
+		// clears the screen
+		SDL_RenderClear(rend);
+		SDL_RenderCopy(rend, tex, NULL, &dest);
+
+		// triggers the double buffers
+		// for multiple rendering
+		SDL_RenderPresent(rend);
+
+		// calculates to 60 fps
+		SDL_Delay(1000 / 60);
 	}
 
 	// clean up
+    SDL_DestroyTexture(tex);
+    SDL_DestroyRenderer(rend);
 	SDL_DestroyWindow(sdl_window);
 	SDL_Quit();
 
