@@ -6,6 +6,7 @@ const int SPRITE_FRAME_W = 96/3;
 const int SPRITE_FRAME_H = 144/4;
 const int SS_DOWN = 4;
 const int SS_ACROSS = 3;
+const int MAX_FRAME = SS_ACROSS - 1;
 
 /*
 Load a surface from a file
@@ -40,12 +41,16 @@ std::unordered_map<Direction, std::vector<SDL_Texture*>> loadSpritesheet(SDL_Ren
             SDL_Rect clip = {.x = frame_x_start, .y = frame_y_start, .w = SPRITE_FRAME_W, .h = SPRITE_FRAME_H};
             SDL_Surface *cropped = SDL_CreateRGBSurface(0, SPRITE_FRAME_W, SPRITE_FRAME_H, 32, 0, 0, 0, 0);
             if (cropped == NULL) {
-                printf("error creating crop surface: %s\n", SDL_GetError());
+                printf("Error creating crop surface: %s\n", SDL_GetError());
             }
-            if (SDL_BlitSurface(spritesheet, NULL, cropped, &clip)) {
+            if (SDL_BlitSurface(spritesheet, &clip, cropped, NULL)) {
                 printf("Could not create spritesheet frame: %s\n", SDL_GetError());
             }
-            sheet[order[index]].push_back(SDL_CreateTextureFromSurface(rend, cropped));
+            SDL_Texture *texture_frame = SDL_CreateTextureFromSurface(rend, cropped);
+            if (texture_frame == NULL) {
+                printf("Error converting surface to texture: %s\n", SDL_GetError());
+            }
+            sheet[order[index]].push_back(texture_frame);
             SDL_FreeSurface(cropped);
         }
         index += 1;
@@ -63,6 +68,18 @@ Sprite::Sprite(char *spritesheet_fname, SDL_Renderer *rend, SDL_Window *window) 
     }
     spritesheet = loadSpritesheet(rend, temp_surface, SS_DOWN, SS_ACROSS);
     SDL_FreeSurface(temp_surface);
+
+    position.x = 20;
+    position.y = 20;
+    position.w = SPRITE_FRAME_W;
+    position.h = SPRITE_FRAME_H;
+
+    speed = 5;
+
+    facing = Direction::Down;
+
+    cur_frame = 0;
+
     std::cout << "constructing sprite completed" << std::endl;
 }
 
@@ -76,5 +93,29 @@ Sprite::~Sprite() {
 }
 
 SDL_Texture* Sprite::getCurrentFrame() {
-    return spritesheet[Direction::Down].at(0);
+    return spritesheet[facing].at(cur_frame%SS_ACROSS);
+}
+
+SDL_Rect* Sprite::getPosition() {
+    return &position;
+}
+
+// todo: boundary checking
+void Sprite::move(Direction d) {
+    facing = d;
+    switch (d) {
+        case Direction::Left: 
+            position.x -= speed;
+            break;
+        case Direction::Right:
+            position.x += speed;
+            break;
+        case Direction::Up:
+            position.y -= speed;
+            break;
+        case Direction::Down:
+            position.y += speed;
+            break;
+    }
+    cur_frame++;
 }

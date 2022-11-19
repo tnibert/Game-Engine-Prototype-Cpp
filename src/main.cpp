@@ -56,17 +56,6 @@ int main(int argc, char *argv[]) {
 
 	Sprite *spr = new Sprite("../assets/reaper.png", rend, sdl_window);
 
-	// let us control our image position
-    // so that we can move it with our keyboard.
-    SDL_Rect dest;
- 
-    // connects our texture with dest to control position
-    SDL_QueryTexture(spr->getCurrentFrame(), NULL, NULL, &dest.w, &dest.h);
-	// sets initial x-position of object
-    dest.x = 20;
-    // sets initial y-position of object
-    dest.y = 20;
-
 	SDL_AddEventWatch(resizeCallback, sdl_window);
 
 	bool isRunning = true;
@@ -79,20 +68,33 @@ int main(int argc, char *argv[]) {
 			}
 			else if (sdl_event.type == SDL_KEYDOWN) {
 				switch (sdl_event.key.keysym.sym) {
-				case SDLK_ESCAPE:
-					isRunning = false;
-					break;
-				case SDLK_F11:
-					if (curr_screen_size != SCREENSIZE::fullscreen) { // then set it to fullscreen and save prev state
-						last_non_fullscreen_size = curr_screen_size;
-						curr_screen_size = SCREENSIZE::fullscreen;
-						SDL_SetWindowFullscreen(sdl_window, window_flags | SDL_WINDOW_FULLSCREEN_DESKTOP);
-					} else { // is currently fullscreen, set it back to the prev state
-						curr_screen_size = last_non_fullscreen_size;
-						SDL_SetWindowFullscreen(sdl_window, window_flags);
-					}
-					SDL_GetWindowSize(sdl_window, &win_width, &win_height);
-					break;
+					case SDLK_ESCAPE:
+						isRunning = false;
+						break;
+					// todo: this full screen doesn't currently scale anything, it changes the dimensions
+					case SDLK_F11:
+						if (curr_screen_size != SCREENSIZE::fullscreen) { // then set it to fullscreen and save prev state
+							last_non_fullscreen_size = curr_screen_size;
+							curr_screen_size = SCREENSIZE::fullscreen;
+							SDL_SetWindowFullscreen(sdl_window, window_flags | SDL_WINDOW_FULLSCREEN_DESKTOP);
+						} else { // is currently fullscreen, set it back to the prev state
+							curr_screen_size = last_non_fullscreen_size;
+							SDL_SetWindowFullscreen(sdl_window, window_flags);
+						}
+						SDL_GetWindowSize(sdl_window, &win_width, &win_height);
+						break;
+					case SDLK_RIGHT:
+						spr->move(Direction::Right);
+						break;
+					case SDLK_DOWN:
+						spr->move(Direction::Down);
+						break;
+					case SDLK_UP:
+						spr->move(Direction::Up);
+						break;
+					case SDLK_LEFT:
+						spr->move(Direction::Left);
+						break;
 				}
 			}
 		}
@@ -101,7 +103,7 @@ int main(int argc, char *argv[]) {
 
 		// clears the screen
 		SDL_RenderClear(rend);
-		SDL_RenderCopy(rend, spr->getCurrentFrame(), NULL, &dest);
+		SDL_RenderCopy(rend, spr->getCurrentFrame(), NULL, spr->getPosition());
 
 		// triggers the double buffers
 		// for multiple rendering
