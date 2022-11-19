@@ -1,5 +1,4 @@
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_image.h>
+#include "ironlotus.h"
 #include <stdio.h>
 
 //https://stackoverflow.com/questions/32294913/getting-contiunous-window-resize-event-in-sdl-2
@@ -11,26 +10,6 @@ static int resizeCallback(void *data, SDL_Event *event) {
 		}
 	}
 	return 0;
-}
-
-/*
-Load a surface from a file
-Return NULL if we can't load the surface
-*/
-SDL_Surface* loadSurface(SDL_Window *window, char *fname) {
-    SDL_Surface *temp = NULL;
-    SDL_Surface *opt = NULL;
-
-    if ((temp = IMG_Load(fname)) == NULL) {
-        return NULL;
-    }
-
-    if(window == NULL) return NULL;
-
-    opt = SDL_ConvertSurfaceFormat(temp, SDL_GetWindowPixelFormat(window), 0);
-    SDL_FreeSurface(temp);
-
-    return opt;
 }
 
 int main(int argc, char *argv[]) {
@@ -64,7 +43,7 @@ int main(int argc, char *argv[]) {
 
 	// Check that the window was successfully created
 	if (sdl_window == nullptr) {
-		printf("Could not create window: %s", SDL_GetError());
+		printf("Could not create SDL window: %s", SDL_GetError());
 		return -1;
 	}
 
@@ -75,25 +54,14 @@ int main(int argc, char *argv[]) {
     // creates a renderer to render our images
     SDL_Renderer* rend = SDL_CreateRenderer(sdl_window, -1, render_flags);
 
-    // load assets
-    SDL_Surface *reaper = loadSurface(sdl_window, "../assets/reaper.png");
-    if (reaper == NULL) {
-        printf("Could not initialize asset");
-        return -1;
-    }
-
-	// loads image to our graphics hardware memory.
-    SDL_Texture* tex = SDL_CreateTextureFromSurface(rend, reaper);
-
-    // free memory when we are done with it
-    SDL_FreeSurface(reaper);
+	Sprite *spr = new Sprite("../assets/reaper.png", rend, sdl_window);
 
 	// let us control our image position
     // so that we can move it with our keyboard.
     SDL_Rect dest;
  
     // connects our texture with dest to control position
-    SDL_QueryTexture(tex, NULL, NULL, &dest.w, &dest.h);
+    SDL_QueryTexture(spr->getCurrentFrame(), NULL, NULL, &dest.w, &dest.h);
 	// sets initial x-position of object
     dest.x = 20;
     // sets initial y-position of object
@@ -133,7 +101,7 @@ int main(int argc, char *argv[]) {
 
 		// clears the screen
 		SDL_RenderClear(rend);
-		SDL_RenderCopy(rend, tex, NULL, &dest);
+		SDL_RenderCopy(rend, spr->getCurrentFrame(), NULL, &dest);
 
 		// triggers the double buffers
 		// for multiple rendering
@@ -144,7 +112,7 @@ int main(int argc, char *argv[]) {
 	}
 
 	// clean up
-    SDL_DestroyTexture(tex);
+    delete spr;
     SDL_DestroyRenderer(rend);
 	SDL_DestroyWindow(sdl_window);
 	SDL_Quit();
