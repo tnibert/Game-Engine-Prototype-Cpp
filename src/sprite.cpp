@@ -58,7 +58,6 @@ std::unordered_map<Direction, std::vector<SDL_Texture*>> loadSpritesheet(SDL_Ren
     return sheet; 
 }
 
-
 Sprite::Sprite(char *spritesheet_fname, SDL_Renderer *rend, SDL_Window *window) {
     std::cout << "constructing sprite" << std::endl;
 

@@ -18,7 +18,7 @@ int main(int argc, char *argv[]) {
 	unsigned int window_flags = SDL_WINDOW_OPENGL;
 
 	if (SDL_Init(SDL_INIT_EVERYTHING)) {
-		printf("Failed to init SDL Video, error: %s", SDL_GetError());
+		printf("Failed to init SDL, error: %s", SDL_GetError());
 		return -1;
 	}
 
@@ -33,7 +33,7 @@ int main(int argc, char *argv[]) {
 
 	// Create an application window with the following settings:
 	sdl_window = SDL_CreateWindow(
-		"(F11: fullscreen ESC: quit)",                // window title
+		"Iron Lotus Demo (F11: fullscreen ESC: quit)",
 		SDL_WINDOWPOS_UNDEFINED,					  // initial x position
 		SDL_WINDOWPOS_UNDEFINED,					  // initial y position
 		win_width,									  // width, in pixels
