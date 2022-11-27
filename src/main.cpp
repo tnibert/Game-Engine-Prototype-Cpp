@@ -56,14 +56,17 @@ int main(int argc, char *argv[]) {
     // creates a renderer to render our images
     SDL_Renderer* rend = SDL_CreateRenderer(sdl_window, -1, render_flags);
 
-	Sprite *spr = new Sprite("../assets/reaper.png", rend, SDL_GetWindowPixelFormat(sdl_window));
+	//Sprite *spr = new Sprite("../assets/reaper.png", rend, SDL_GetWindowPixelFormat(sdl_window));
+	Player *player = new Player(rend, SDL_GetWindowPixelFormat(sdl_window));
+	Scene *scene = new Scene(rend);
+	scene->attach(player);
 
 	SDL_AddEventWatch(resizeCallback, sdl_window);
 
 	bool isRunning = true;
 	SDL_Event sdl_event;
 	while (isRunning) {
-		// 1. check events
+		// check events
 		while (SDL_PollEvent(&sdl_event) != 0) {
 			if (sdl_event.type == SDL_QUIT) {
 				isRunning = false;
@@ -86,36 +89,30 @@ int main(int argc, char *argv[]) {
 						SDL_GetWindowSize(sdl_window, &win_width, &win_height);
 						break;
 					case SDLK_RIGHT:
-						spr->move(Direction::Right);
+						//spr->move(Direction::Right);
 						break;
 					case SDLK_DOWN:
-						spr->move(Direction::Down);
+						//spr->move(Direction::Down);
 						break;
 					case SDLK_UP:
-						spr->move(Direction::Up);
+						//spr->move(Direction::Up);
 						break;
 					case SDLK_LEFT:
-						spr->move(Direction::Left);
+						//spr->move(Direction::Left);
 						break;
 				}
 			}
 		}
 
-		// 2. update screen
-
-		// clears the screen
-		SDL_RenderClear(rend);
-		SDL_RenderCopy(rend, spr->getCurrentFrame(), NULL, spr->getPosition());
-
-		// triggers the double buffers
-		// for multiple rendering
-		SDL_RenderPresent(rend);
+		scene->updateCycle();
+		scene->renderCycle();
 
 		SDL_Delay(1000 / FPS);
 	}
 
 	// clean up
-    delete spr;
+    delete player;
+	delete scene;
     SDL_DestroyRenderer(rend);
 	SDL_DestroyWindow(sdl_window);
 	SDL_Quit();

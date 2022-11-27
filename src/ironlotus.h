@@ -31,10 +31,8 @@ class Sprite {
  */
 class GameObject {
     public:
-        GameObject();
-        ~GameObject();
         virtual void update() = 0;
-        void render(SDL_Renderer*);
+        virtual void render(SDL_Renderer*) = 0;
 };
 
 class Scene {
@@ -42,6 +40,7 @@ class Scene {
         std::vector<GameObject*> gameObjects;
         SDL_Renderer* renderer;
     public:
+        Scene(SDL_Renderer*);
         void attach(GameObject*);
         void remove(GameObject*);
         void updateCycle();
@@ -59,6 +58,16 @@ class GameStrategy {
         ~GameStrategy();
         virtual void setup() = 0;
         LevelState runGame();
+};
+
+class Player : public GameObject {
+    private:
+        Sprite *spr;
+    public:
+        Player(SDL_Renderer *rend, Uint32 pixelFmt);
+        ~Player();
+        void update();
+        void render(SDL_Renderer*);
 };
 
 #endif
