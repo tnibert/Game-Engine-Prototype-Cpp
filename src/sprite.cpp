@@ -12,7 +12,7 @@ const int MAX_FRAME = SS_ACROSS - 1;
 Load a surface from a file
 Return NULL if we can't load the surface
 */
-SDL_Surface* loadSurface(SDL_Window *window, char *fname) {
+SDL_Surface* loadSurface(Uint32 pixelFmt, char *fname) {
     SDL_Surface *temp = NULL;
     SDL_Surface *opt = NULL;
 
@@ -20,9 +20,7 @@ SDL_Surface* loadSurface(SDL_Window *window, char *fname) {
         return NULL;
     }
 
-    if(window == NULL) return NULL;
-
-    opt = SDL_ConvertSurfaceFormat(temp, SDL_GetWindowPixelFormat(window), 0);
+    opt = SDL_ConvertSurfaceFormat(temp, pixelFmt, 0);
     SDL_FreeSurface(temp);
 
     return opt;
@@ -58,10 +56,10 @@ std::unordered_map<Direction, std::vector<SDL_Texture*>> loadSpritesheet(SDL_Ren
     return sheet; 
 }
 
-Sprite::Sprite(char *spritesheet_fname, SDL_Renderer *rend, SDL_Window *window) {
+Sprite::Sprite(char *spritesheet_fname, SDL_Renderer *rend, Uint32 pixelFmt) {
     std::cout << "constructing sprite" << std::endl;
 
-    SDL_Surface *temp_surface = loadSurface(window, spritesheet_fname);
+    SDL_Surface *temp_surface = loadSurface(pixelFmt, spritesheet_fname);
     if (temp_surface == NULL) {
         printf("Could not load spritesheet");
     }

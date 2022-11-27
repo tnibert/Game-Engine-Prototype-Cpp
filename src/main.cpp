@@ -1,6 +1,8 @@
 #include "ironlotus.h"
 #include <stdio.h>
 
+const int FPS = 30;
+
 //https://stackoverflow.com/questions/32294913/getting-contiunous-window-resize-event-in-sdl-2
 static int resizeCallback(void *data, SDL_Event *event) {
 	if (event->type == SDL_WINDOWEVENT && event->window.event == SDL_WINDOWEVENT_RESIZED) {
@@ -54,7 +56,7 @@ int main(int argc, char *argv[]) {
     // creates a renderer to render our images
     SDL_Renderer* rend = SDL_CreateRenderer(sdl_window, -1, render_flags);
 
-	Sprite *spr = new Sprite("../assets/reaper.png", rend, sdl_window);
+	Sprite *spr = new Sprite("../assets/reaper.png", rend, SDL_GetWindowPixelFormat(sdl_window));
 
 	SDL_AddEventWatch(resizeCallback, sdl_window);
 
@@ -109,8 +111,7 @@ int main(int argc, char *argv[]) {
 		// for multiple rendering
 		SDL_RenderPresent(rend);
 
-		// calculates to 60 fps
-		SDL_Delay(1000 / 60);
+		SDL_Delay(1000 / FPS);
 	}
 
 	// clean up

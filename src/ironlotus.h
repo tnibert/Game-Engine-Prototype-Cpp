@@ -19,7 +19,7 @@ class Sprite {
         Direction facing;
         int cur_frame;
     public:
-        Sprite(char*, SDL_Renderer*, SDL_Window*);
+        Sprite(char*, SDL_Renderer*, Uint32);
         ~Sprite();
         SDL_Texture* getCurrentFrame();
         SDL_Rect* getPosition();
@@ -34,7 +34,7 @@ class GameObject {
         GameObject();
         ~GameObject();
         virtual void update() = 0;
-        void render();
+        void render(SDL_Renderer*);
 };
 
 class Scene {
