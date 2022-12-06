@@ -3,21 +3,10 @@
 
 const int FPS = 30;
 
-//https://stackoverflow.com/questions/32294913/getting-contiunous-window-resize-event-in-sdl-2
-static int resizeCallback(void *data, SDL_Event *event) {
-	if (event->type == SDL_WINDOWEVENT && event->window.event == SDL_WINDOWEVENT_RESIZED) {
-		SDL_Window *win = SDL_GetWindowFromID(event->window.windowID);
-		if (win == (SDL_Window *)data) {
-			printf("resizing.....\n");
-		}
-	}
-	return 0;
-}
-
 int main(int argc, char *argv[]) {
 	SDL_Window *sdl_window = nullptr;
 
-	unsigned int window_flags = SDL_WINDOW_OPENGL;
+	unsigned int window_flags = SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP;
 
 	if (SDL_Init(SDL_INIT_EVERYTHING)) {
 		printf("Failed to init SDL, error: %s", SDL_GetError());
@@ -26,16 +15,10 @@ int main(int argc, char *argv[]) {
 
 	int win_width = 640;
 	int win_height = 480;
-	enum class SCREENSIZE {
-		is640x480,
-		is1366x768,
-		fullscreen
-	} curr_screen_size = SCREENSIZE::is640x480,
-	  last_non_fullscreen_size = SCREENSIZE::is640x480;
 
 	// Create an application window with the following settings:
 	sdl_window = SDL_CreateWindow(
-		"Iron Lotus Demo (F11: fullscreen ESC: quit)",
+		"Iron Lotus Demo (ESC: quit)",
 		SDL_WINDOWPOS_UNDEFINED,					  // initial x position
 		SDL_WINDOWPOS_UNDEFINED,					  // initial y position
 		win_width,									  // width, in pixels
@@ -54,14 +37,12 @@ int main(int argc, char *argv[]) {
     Uint32 render_flags = SDL_RENDERER_ACCELERATED;
  
     // creates a renderer to render our images
-    SDL_Renderer* rend = SDL_CreateRenderer(sdl_window, -1, render_flags);
+    SDL_Renderer *rend = SDL_CreateRenderer(sdl_window, -1, render_flags);
 
 	//Sprite *spr = new Sprite("../assets/reaper.png", rend, SDL_GetWindowPixelFormat(sdl_window));
 	Player *player = new Player(rend, SDL_GetWindowPixelFormat(sdl_window));
 	Scene *scene = new Scene(rend);
 	scene->attach(player);
-
-	SDL_AddEventWatch(resizeCallback, sdl_window);
 
 	bool isRunning = true;
 	SDL_Event sdl_event;
@@ -75,18 +56,6 @@ int main(int argc, char *argv[]) {
 				switch (sdl_event.key.keysym.sym) {
 					case SDLK_ESCAPE:
 						isRunning = false;
-						break;
-					// todo: this full screen doesn't currently scale anything, it changes the dimensions
-					case SDLK_F11:
-						if (curr_screen_size != SCREENSIZE::fullscreen) { // then set it to fullscreen and save prev state
-							last_non_fullscreen_size = curr_screen_size;
-							curr_screen_size = SCREENSIZE::fullscreen;
-							SDL_SetWindowFullscreen(sdl_window, window_flags | SDL_WINDOW_FULLSCREEN_DESKTOP);
-						} else { // is currently fullscreen, set it back to the prev state
-							curr_screen_size = last_non_fullscreen_size;
-							SDL_SetWindowFullscreen(sdl_window, window_flags);
-						}
-						SDL_GetWindowSize(sdl_window, &win_width, &win_height);
 						break;
 					case SDLK_RIGHT:
 						//spr->move(Direction::Right);
