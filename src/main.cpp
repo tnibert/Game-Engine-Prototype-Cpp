@@ -6,7 +6,7 @@ const int FPS = 30;
 int main(int argc, char *argv[]) {
 	SDL_Window *sdl_window = nullptr;
 
-	unsigned int window_flags = SDL_WINDOW_OPENGL | SDL_WINDOW_FULLSCREEN_DESKTOP;
+	unsigned int window_flags = SDL_WINDOW_OPENGL /*| SDL_WINDOW_FULLSCREEN_DESKTOP*/;
 
 	if (SDL_Init(SDL_INIT_EVERYTHING)) {
 		printf("Failed to init SDL, error: %s", SDL_GetError());
@@ -39,8 +39,8 @@ int main(int argc, char *argv[]) {
     // creates a renderer to render our images
     SDL_Renderer *rend = SDL_CreateRenderer(sdl_window, -1, render_flags);
 
-	//Sprite *spr = new Sprite("../assets/reaper.png", rend, SDL_GetWindowPixelFormat(sdl_window));
-	Player *player = new Player(rend, SDL_GetWindowPixelFormat(sdl_window));
+	std::queue<SDL_Keycode> *inputQueue = new std::queue<SDL_Keycode>();
+	Player *player = new Player(rend, SDL_GetWindowPixelFormat(sdl_window), inputQueue);
 	Scene *scene = new Scene(rend);
 	scene->attach(player);
 
@@ -58,16 +58,16 @@ int main(int argc, char *argv[]) {
 						isRunning = false;
 						break;
 					case SDLK_RIGHT:
-						//spr->move(Direction::Right);
+						inputQueue->push(SDLK_RIGHT);
 						break;
 					case SDLK_DOWN:
-						//spr->move(Direction::Down);
+						inputQueue->push(SDLK_DOWN);
 						break;
 					case SDLK_UP:
-						//spr->move(Direction::Up);
+						inputQueue->push(SDLK_UP);
 						break;
 					case SDLK_LEFT:
-						//spr->move(Direction::Left);
+						inputQueue->push(SDLK_LEFT);
 						break;
 				}
 			}

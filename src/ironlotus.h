@@ -5,6 +5,8 @@
 #include <SDL2/SDL_image.h>
 #include <unordered_map>
 #include <vector>
+#include <queue>
+#include <iostream>
 
 typedef int Layer;
 
@@ -63,8 +65,9 @@ class GameStrategy {
 class Player : public GameObject {
     private:
         Sprite *spr;
+        std::queue<SDL_Keycode> *inputQueue;
     public:
-        Player(SDL_Renderer *rend, Uint32 pixelFmt);
+        Player(SDL_Renderer*, Uint32, std::queue<SDL_Keycode>*);
         ~Player();
         void update();
         void render(SDL_Renderer*);
