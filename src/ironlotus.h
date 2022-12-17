@@ -54,12 +54,11 @@ class Scene {
 */
 class GameStrategy {
     private:
-        Scene scene;
+        Scene *scene;
     public:
-        GameStrategy(Scene);        // GameStrategy takes ownership of Scene
+        GameStrategy(Scene*);        // GameStrategy takes ownership of Scene
         ~GameStrategy();
-        virtual void setup() = 0;
-        LevelState runGame();
+        LevelState runFrame();
 };
 
 class Player : public GameObject {
@@ -72,5 +71,9 @@ class Player : public GameObject {
         void update();
         void render(SDL_Renderer*);
 };
+
+/*class Town : public GameStrategy {
+
+}*/
 
 #endif

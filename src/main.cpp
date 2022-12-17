@@ -43,6 +43,7 @@ int main(int argc, char *argv[]) {
 	Player *player = new Player(rend, SDL_GetWindowPixelFormat(sdl_window), inputQueue);
 	Scene *scene = new Scene(rend);
 	scene->attach(player);
+	GameStrategy *test = new GameStrategy(scene);
 
 	bool isRunning = true;
 	SDL_Event sdl_event;
@@ -72,16 +73,16 @@ int main(int argc, char *argv[]) {
 				}
 			}
 		}
-
-		scene->updateCycle();
-		scene->renderCycle();
+		
+		test->runFrame();
 
 		SDL_Delay(1000 / FPS);
 	}
 
 	// clean up
     delete player;
-	delete scene;
+	delete test;
+	delete inputQueue;
     SDL_DestroyRenderer(rend);
 	SDL_DestroyWindow(sdl_window);
 	SDL_Quit();
