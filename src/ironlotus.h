@@ -13,6 +13,8 @@ typedef int Layer;
 enum class Direction {Left, Right, Up, Down};
 enum class LevelState {EndLevel, Proceed};
 
+SDL_Surface* loadSurface(Uint32 pixelFmt, char *fname);
+
 class Sprite {
     private:
         std::unordered_map<Direction, std::vector<SDL_Texture*>> spritesheet;
@@ -21,7 +23,7 @@ class Sprite {
         Direction facing;
         int cur_frame;
     public:
-        Sprite(char*, SDL_Renderer*, Uint32);
+        Sprite(char*, SDL_Renderer*);
         ~Sprite();
         SDL_Texture* getCurrentFrame();
         SDL_Rect* getPosition();
@@ -63,10 +65,10 @@ class GameStrategy {
 
 class Player : public GameObject {
     private:
-        Sprite *spr;
-        std::queue<SDL_Keycode> *inputQueue;
+        Sprite* spr;
+        std::queue<SDL_Keycode>* inputQueue;
     public:
-        Player(SDL_Renderer*, Uint32, std::queue<SDL_Keycode>*);
+        Player(SDL_Renderer*, std::queue<SDL_Keycode>*);
         ~Player();
         void update();
         void render(SDL_Renderer*);
@@ -76,6 +78,21 @@ class Town : public GameStrategy {
     public:
         Town(Scene*);
         ~Town();
+};
+
+/*
+ * Singleton so that pixel format doesn't need to be passed around all over the place.
+ */
+class SurfaceLoader {
+    private:
+        Uint32 pixelFmt;
+        static SurfaceLoader* instance;
+        SurfaceLoader();
+    public:
+        SurfaceLoader(const SurfaceLoader& obj) = delete;
+        static SurfaceLoader* getInstance();
+        void setPixelFormat(Uint32);
+        SDL_Surface* loadSurface(char *fname);
 };
 
 #endif

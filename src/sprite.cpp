@@ -8,24 +8,6 @@ const int SS_DOWN = 4;
 const int SS_ACROSS = 3;
 const int MAX_FRAME = SS_ACROSS - 1;
 
-/*
-Load a surface from a file
-Return NULL if we can't load the surface
-*/
-SDL_Surface* loadSurface(Uint32 pixelFmt, char *fname) {
-    SDL_Surface *temp = NULL;
-    SDL_Surface *opt = NULL;
-
-    if ((temp = IMG_Load(fname)) == NULL) {
-        return NULL;
-    }
-
-    opt = SDL_ConvertSurfaceFormat(temp, pixelFmt, 0);
-    SDL_FreeSurface(temp);
-
-    return opt;
-}
-
 // todo: error handling with teeth
 std::unordered_map<Direction, std::vector<SDL_Texture*>> loadSpritesheet(SDL_Renderer *rend, SDL_Surface *spritesheet, int rows, int columns) {
     std::unordered_map<Direction, std::vector<SDL_Texture*>> sheet;
@@ -56,10 +38,10 @@ std::unordered_map<Direction, std::vector<SDL_Texture*>> loadSpritesheet(SDL_Ren
     return sheet; 
 }
 
-Sprite::Sprite(char *spritesheet_fname, SDL_Renderer *rend, Uint32 pixelFmt) {
+Sprite::Sprite(char *spritesheet_fname, SDL_Renderer *rend) {
     std::cout << "constructing sprite" << std::endl;
 
-    SDL_Surface *temp_surface = loadSurface(pixelFmt, spritesheet_fname);
+    SDL_Surface *temp_surface = SurfaceLoader::getInstance()->loadSurface(spritesheet_fname);
     if (temp_surface == NULL) {
         printf("Could not load spritesheet");
     }
