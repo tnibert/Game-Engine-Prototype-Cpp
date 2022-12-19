@@ -72,8 +72,10 @@ class Player : public GameObject {
         void render(SDL_Renderer*);
 };
 
-/*class Town : public GameStrategy {
-
-}*/
+class Town : public GameStrategy {
+    public:
+        Town(Scene*);
+        ~Town();
+};
 
 #endif

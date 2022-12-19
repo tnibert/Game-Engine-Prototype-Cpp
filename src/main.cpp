@@ -40,10 +40,12 @@ int main(int argc, char *argv[]) {
     SDL_Renderer *rend = SDL_CreateRenderer(sdl_window, -1, render_flags);
 
 	std::queue<SDL_Keycode> *inputQueue = new std::queue<SDL_Keycode>();
+
+	// todo: move setup to Town
 	Player *player = new Player(rend, SDL_GetWindowPixelFormat(sdl_window), inputQueue);
 	Scene *scene = new Scene(rend);
 	scene->attach(player);
-	GameStrategy *test = new GameStrategy(scene);
+	GameStrategy *test = new Town(scene);
 
 	bool isRunning = true;
 	SDL_Event sdl_event;
