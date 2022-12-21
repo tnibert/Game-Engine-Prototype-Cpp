@@ -13,7 +13,9 @@ typedef int Layer;
 enum class Direction {Left, Right, Up, Down};
 enum class LevelState {EndLevel, Proceed};
 
-SDL_Surface* loadSurface(Uint32 pixelFmt, char *fname);
+// todo: temporary defines, replace with something better
+#define SPRITE_FRAME_W 96/3
+#define SPRITE_FRAME_H 144/4
 
 class Sprite {
     private:
@@ -23,7 +25,7 @@ class Sprite {
         Direction facing;
         int cur_frame;
     public:
-        Sprite(char*, SDL_Renderer*);
+        Sprite(char*);
         ~Sprite();
         SDL_Texture* getCurrentFrame();
         SDL_Rect* getPosition();
@@ -36,15 +38,14 @@ class Sprite {
 class GameObject {
     public:
         virtual void update() = 0;
-        virtual void render(SDL_Renderer*) = 0;
+        virtual void render() = 0;
 };
 
 class Scene {
     private:
         std::vector<GameObject*> gameObjects;
-        SDL_Renderer* renderer;
     public:
-        Scene(SDL_Renderer*);
+        Scene();
         void attach(GameObject*);
         void remove(GameObject*);
         void updateCycle();
@@ -68,10 +69,10 @@ class Player : public GameObject {
         Sprite* spr;
         std::queue<SDL_Keycode>* inputQueue;
     public:
-        Player(SDL_Renderer*, std::queue<SDL_Keycode>*);
+        Player(std::queue<SDL_Keycode>*);
         ~Player();
         void update();
-        void render(SDL_Renderer*);
+        void render();
 };
 
 class Town : public GameStrategy {
@@ -81,18 +82,28 @@ class Town : public GameStrategy {
 };
 
 /*
- * Singleton so that pixel format doesn't need to be passed around all over the place.
+ * Encapsulates graphics context and prevents passing around of library specific graphics objects.
+ * Private singleton used to provide static service methods to rest of engine.
  */
-class SurfaceLoader {
+class GraphicsContext {
     private:
         Uint32 pixelFmt;
-        static SurfaceLoader* instance;
-        SurfaceLoader();
+        SDL_Renderer* renderer;
+        SDL_Window* window;
+        static GraphicsContext* instance;
+        static GraphicsContext* getInstance();
+        GraphicsContext(SDL_Window*);
+        ~GraphicsContext();
+
     public:
-        SurfaceLoader(const SurfaceLoader& obj) = delete;
-        static SurfaceLoader* getInstance();
-        void setPixelFormat(Uint32);
-        SDL_Surface* loadSurface(char *fname);
+        GraphicsContext(const GraphicsContext& obj) = delete;
+        static void initialize(SDL_Window*);
+        static void destroy();
+        static SDL_Surface* loadSurface(char *fname);
+        static std::unordered_map<Direction, std::vector<SDL_Texture*>> loadSpritesheet(SDL_Surface *spritesheet, int rows, int columns);
+        static void renderCopy(SDL_Texture*, SDL_Rect*);
+        static void renderClear();
+        static void renderPresent();
 };
 
 #endif

@@ -32,20 +32,13 @@ int main(int argc, char *argv[]) {
 		return -1;
 	}
 
-	SurfaceLoader::getInstance()->setPixelFormat(SDL_GetWindowPixelFormat(sdl_window));
-
-	// triggers the program that controls
-    // your graphics hardware and sets flags
-    Uint32 render_flags = SDL_RENDERER_ACCELERATED;
- 
-    // creates a renderer to render our images
-    SDL_Renderer *rend = SDL_CreateRenderer(sdl_window, -1, render_flags);
+	GraphicsContext::initialize(sdl_window);
 
 	std::queue<SDL_Keycode> *inputQueue = new std::queue<SDL_Keycode>();
 
 	// todo: move setup to Town
-	Player *player = new Player(rend, inputQueue);
-	Scene *scene = new Scene(rend);
+	Player *player = new Player(inputQueue);
+	Scene *scene = new Scene();
 	scene->attach(player);
 	GameStrategy *test = new Town(scene);
 
@@ -87,8 +80,7 @@ int main(int argc, char *argv[]) {
     delete player;
 	delete test;
 	delete inputQueue;
-    SDL_DestroyRenderer(rend);
-	SDL_DestroyWindow(sdl_window);
+    GraphicsContext::destroy();
 	SDL_Quit();
 
 	return 0;

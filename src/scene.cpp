@@ -1,8 +1,6 @@
 #include "ironlotus.h"
 
-Scene::Scene(SDL_Renderer* rend) {
-    renderer = rend;
-}
+Scene::Scene() {}
 
 void Scene::attach(GameObject* gameObj) {
     gameObjects.push_back(gameObj);
@@ -20,9 +18,9 @@ void Scene::updateCycle() {
 }
 
 void Scene::renderCycle() {
-    SDL_RenderClear(renderer);
+    GraphicsContext::renderClear();
     for(GameObject *gameObj : gameObjects) {
-        gameObj->render(renderer);
+        gameObj->render();
     }
-    SDL_RenderPresent(renderer);
+    GraphicsContext::renderPresent();
 }

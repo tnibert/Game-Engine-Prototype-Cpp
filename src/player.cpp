@@ -1,7 +1,7 @@
 #include "ironlotus.h"
 
-Player::Player(SDL_Renderer *rend, std::queue<SDL_Keycode> *input) {
-    spr = new Sprite("../assets/reaper.png", rend);
+Player::Player(std::queue<SDL_Keycode> *input) {
+    spr = new Sprite("../assets/reaper.png");
     inputQueue = input;
 }
 
@@ -29,6 +29,6 @@ void Player::update() {
     }
 }
 
-void Player::render(SDL_Renderer *rend) {
-    SDL_RenderCopy(rend, spr->getCurrentFrame(), NULL, spr->getPosition());
+void Player::render() {
+    GraphicsContext::renderCopy(spr->getCurrentFrame(), spr->getPosition());
 }
