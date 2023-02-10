@@ -32,18 +32,19 @@ int main(int argc, char *argv[]) {
 		return -1;
 	}
 
+	// todo: create window within initialize()
 	GraphicsContext::initialize(sdl_window);
 
 	std::queue<SDL_Keycode> *inputQueue = new std::queue<SDL_Keycode>();
 
-	// todo: move setup to Town
 	Player *player = new Player(inputQueue);
-	Scene *scene = new Scene();
-	scene->attach(player);
-	GameStrategy *test = new Town(scene);
+	std::cout << player << std::endl;
+
+	Town *gameTown = new Town(player);
 
 	bool isRunning = true;
 	SDL_Event sdl_event;
+	std::cout << player << std::endl;
 	while (isRunning) {
 		// check events
 		while (SDL_PollEvent(&sdl_event) != 0) {
@@ -71,15 +72,20 @@ int main(int argc, char *argv[]) {
 			}
 		}
 		
-		test->runFrame();
+		gameTown->runFrame();
 
 		SDL_Delay(1000 / FPS);
 	}
+	std::cout << player << std::endl;
 
 	// clean up
+	std::cout << "1" << std::endl;
+	delete gameTown;
+	std::cout << "2" << std::endl;
     delete player;
-	delete test;
+	std::cout << "3" << std::endl;
 	delete inputQueue;
+	std::cout << "4" << std::endl;
     GraphicsContext::destroy();
 	SDL_Quit();
 

@@ -5,6 +5,7 @@ GameStrategy::GameStrategy(Scene* scn) {
 }
 
 GameStrategy::~GameStrategy() {
+    std::cout << "GameStrategy destructor" << std::endl;
     delete scene;
 }
 

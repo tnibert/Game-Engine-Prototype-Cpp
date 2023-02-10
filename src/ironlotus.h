@@ -39,29 +39,7 @@ class GameObject {
     public:
         virtual void update() = 0;
         virtual void render() = 0;
-};
-
-class Scene {
-    private:
-        std::vector<GameObject*> gameObjects;
-    public:
-        Scene();
-        void attach(GameObject*);
-        void remove(GameObject*);
-        void updateCycle();
-        void renderCycle();
-};
-
-/*
- * Implementations define how GameObjects enter and exit the scene
-*/
-class GameStrategy {
-    private:
-        Scene *scene;
-    public:
-        GameStrategy(Scene*);        // GameStrategy takes ownership of Scene
-        ~GameStrategy();
-        LevelState runFrame();
+        virtual ~GameObject() = 0;
 };
 
 class Player : public GameObject {
@@ -75,10 +53,45 @@ class Player : public GameObject {
         void render();
 };
 
-class Town : public GameStrategy {
+class TownMap : public GameObject {
     public:
-        Town(Scene*);
+        TownMap();
+        ~TownMap();
+        void update();
+        void render();
+};
+
+class Scene {
+    private:
+        std::vector<GameObject*> gameObjects;           // consider using a set
+    public:
+        Scene();
+        ~Scene();
+        void attach(GameObject*);
+        void remove(GameObject*);
+        void updateCycle();
+        void renderCycle();
+};
+
+/*
+ * Implementations define how GameObjects enter and exit the scene
+*/
+class GameStrategy {
+    protected:
+        Scene* scene;
+    public:
+        GameStrategy(Scene*);        // GameStrategy takes ownership of Scene
+        virtual ~GameStrategy() = 0;
+        LevelState runFrame();
+};
+
+class Town : public GameStrategy {
+    private:
+        Player* player;
+    public:
+        Town(Player*);
         ~Town();
+        LevelState runFrame();
 };
 
 /*
